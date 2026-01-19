@@ -434,8 +434,11 @@
                                     <strong>核心判据：</strong> 如果算出来的最小成本 <span class="math-serif">Z<sub>min</sub> > v(N)</span>（我们要发的钱超过了实际赚的钱），那 Core 就是空的。
                                 </div>
                             </div>
-                            <div class="flex-1 flex justify-center">
-                                <div class="text-6xl">📉</div> 
+                            <!-- FIXED: Replaced simple emoji placeholder with a Chart.js visualization -->
+                            <div class="flex-1 flex justify-center w-full">
+                                <div class="chart-wrapper">
+                                    <canvas id="primalLpChart"></canvas>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -505,7 +508,7 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // --- 1. Imputation Chart Logic (Section 2) ---
+        // --- 1. Imputation Chart Logic (Section 3) ---
         const ctxImputation = document.getElementById('imputationChart').getContext('2d');
         const imputationChart = new Chart(ctxImputation, {
             type: 'bar',
@@ -560,7 +563,7 @@
             imputationChart.update();
         }
 
-        // --- 2. TU Visualizer Logic (Section 3) ---
+        // --- 2. TU Visualizer Logic (Section 2) ---
         function transferMoney() {
             const barP1 = document.getElementById('bar-p1');
             const barP2 = document.getElementById('bar-p2');
@@ -666,7 +669,39 @@
             document.getElementById('content-' + tabName).classList.remove('hidden');
         }
 
-        // --- 5. Balanced Collection Chart (Section 5) ---
+        // --- 5. Charts for Section 5 (Advanced) ---
+        
+        // 5a. Primal LP Chart (The Fix)
+        const ctxPrimal = document.getElementById('primalLpChart').getContext('2d');
+        new Chart(ctxPrimal, {
+            type: 'bar',
+            data: {
+                labels: ['最小成本 (Min Z)', '可用价值 v(N)'],
+                datasets: [{
+                    label: '金额',
+                    data: [120, 100], // Example where Core is Empty (Cost > Value)
+                    backgroundColor: ['#ef4444', '#10b981'], // Red for cost, Green for value
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true }
+                },
+                plugins: {
+                    legend: { display: false },
+                    title: {
+                        display: true,
+                        text: '示例：当需求成本 > 总价值时 (Core Empty)',
+                        font: { size: 14 }
+                    }
+                }
+            }
+        });
+
+        // 5b. Balanced Collection Chart
         const ctxBalanced = document.getElementById('balancedCollectionChart').getContext('2d');
         new Chart(ctxBalanced, {
             type: 'doughnut',
