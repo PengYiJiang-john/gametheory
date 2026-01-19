@@ -7,36 +7,25 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
-        /* Custom Styles for Formula Display */
-        .math-display {
+        /* Math Fonts */
+        .math-serif {
             font-family: 'Times New Roman', Times, serif;
             font-style: italic;
         }
-        .math-symbol {
+        .math-normal {
             font-style: normal;
         }
         
-        /* Smooth Scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
+        /* Smooth Scroll */
+        html { scroll-behavior: smooth; }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        /* Chart Container Utilities */
+        /* Chart Wrapper */
         .chart-wrapper {
             position: relative;
             width: 100%;
@@ -44,10 +33,15 @@
             margin: 0 auto;
             height: 300px;
         }
-        @media (min-width: 768px) {
-            .chart-wrapper {
-                height: 350px;
-            }
+
+        /* Animations */
+        @keyframes transfer-anim {
+            0% { transform: translateX(0); opacity: 1; }
+            50% { transform: translateX(-40px); opacity: 0.5; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+        .animate-transfer {
+            animation: transfer-anim 1s ease-in-out;
         }
 
         /* Slider Styling */
@@ -74,30 +68,8 @@
         }
     </style>
     <!-- Chosen Palette: Warm Neutrals & Academic Teal -->
-    <!-- Background: #f8fafc (Slate 50) -->
-    <!-- Primary Text: #334155 (Slate 700) -->
-    <!-- Accents: #0f766e (Teal 700), #b45309 (Amber 700) for contrast/alerts -->
 </head>
 <body class="bg-slate-50 text-slate-700 font-sans leading-relaxed">
-
-    <!-- Application Structure Plan:
-         1. Hero Section: Title and Introduction.
-         2. Paradigm Shift: Interactive Comparison Cards (Nash vs. Cooperative).
-         3. Building Blocks: Definitions & Interactive 'Synergy' concept check.
-         4. The Core (Interactive Simulation): The 'Glove Game' where users adjust sliders to find stable allocations.
-         5. Advanced Theory: Visualized step-by-step flow for LP Duality and Balanced Collections using Chart.js to visualize weights.
-         6. Conclusion: Summary cards.
-         
-         Rationale: The linear narrative structure ("Scrollytelling") guides the user from basic concepts to complex theory. 
-         Interactive simulations break up the text and allow users to "feel" the instability of allocations, making the abstract "Core" concept concrete.
-    -->
-
-    <!-- Visualization & Content Choices:
-         1. Paradigm Shift -> Goal: Compare -> Viz: Side-by-side interactive cards -> Interaction: Click to reveal details -> Justification: Clear contrast.
-         2. Glove Game -> Goal: Inform/Explore -> Viz: Dynamic Bar Chart + Sliders -> Interaction: Adjust allocation, system checks Core conditions -> Justification: Direct feedback on stability.
-         3. Advanced Theory -> Goal: Explain Process -> Viz: Flow Diagram (HTML/CSS) & Pie Chart for 'Time Sharing' analogy -> Interaction: Tabbed view for Primal/Dual -> Justification: Simplifies complex math.
-         4. NO SVG/Mermaid confirmed. Using Chart.js for data viz and CSS for layout.
-    -->
 
     <!-- Navigation -->
     <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-sm shadow-sm border-b border-slate-200">
@@ -106,6 +78,7 @@
                 <div class="font-bold text-xl text-teal-800 tracking-tight">n-人合作博弈论</div>
                 <div class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
                     <a href="#paradigm" class="hover:text-teal-600 transition">范式转移</a>
+                    <a href="#tu-concept" class="hover:text-teal-600 transition">可转移效用 (TU)</a>
                     <a href="#blocks" class="hover:text-teal-600 transition">基本概念</a>
                     <a href="#core" class="hover:text-teal-600 transition">核心 (The Core)</a>
                     <a href="#advanced" class="hover:text-teal-600 transition">深度理论</a>
@@ -122,7 +95,8 @@
                     从自私的策略到<span class="text-teal-700">合作的艺术</span>
                 </h1>
                 <p class="mt-4 max-w-2xl mx-auto text-xl text-slate-500">
-                    探索 n 人合作博弈论精要：从联盟形成到利益分配的数学原理。
+                    非合作是 Actions 的组合；合作博弈是 Groups 的组合。<br>
+                    探索从“单独决策”到“联盟共赢”的数学飞跃。
                 </p>
                 <div class="mt-10 flex justify-center gap-4">
                     <a href="#paradigm" class="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-teal-700 hover:bg-teal-800 md:py-4 md:text-lg transition shadow-lg hover:shadow-xl">
@@ -135,88 +109,166 @@
 
     <!-- Section 1: The Paradigm Shift -->
     <section id="paradigm" class="py-16 bg-slate-50 border-t border-slate-200">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h2 class="text-3xl font-bold text-slate-900">第一部分：范式转移</h2>
                 <p class="mt-4 text-lg text-slate-600">
-                    为什么要从纳什均衡转向合作博弈？在传统的非合作博弈中，我们关注个体的策略。然而，当参与者超过三人，局面变得极其复杂。合作博弈提供了一个新的视角：关注联盟与价值。
+                    当博弈人数超过 2 人时，我们为什么不再只谈论“策略”？
                 </p>
             </div>
 
-            <!-- Comparison Interactive Cards -->
             <div class="grid md:grid-cols-2 gap-8">
-                <!-- Non-Cooperative Card -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 border border-slate-100 group cursor-pointer" onclick="toggleCard('card-nash')">
-                    <div class="p-8">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold text-slate-800 group-hover:text-teal-700 transition">非合作博弈</h3>
-                            <span class="text-2xl">♟️</span>
+                <!-- Nash Perspective -->
+                <div class="bg-white rounded-xl shadow-md p-8 border border-slate-100 hover:shadow-lg transition duration-300">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">非合作博弈 (Nash 视角)</h3>
+                        <span class="text-2xl">♟️</span>
+                    </div>
+                    <div class="space-y-4 text-slate-600">
+                        <p><strong>2 人时：</strong> 你选策略 <span class="math-serif">a<sub>1</sub></span>，我选 <span class="math-serif">a<sub>2</sub></span>。结果是收益向量：<br>
+                        <span class="math-serif block text-center my-2 bg-slate-50 p-2 rounded">(u<sub>1</sub>(a<sub>1</sub>, a<sub>2</sub>), u<sub>2</sub>(a<sub>1</sub>, a<sub>2</sub>))</span></p>
+                        <p><strong>3 人时：</strong> 推广也没问题：<span class="math-serif">(u<sub>1</sub>(a<sub>1</sub>, a<sub>2</sub>, a<sub>3</sub>), ...)</span></p>
+                        <div class="bg-slate-50 p-4 rounded-lg border-l-4 border-slate-400">
+                            <p class="font-bold text-slate-700">本质局限：</p>
+                            <p class="text-sm">每个人仍然是<strong>单独选策略</strong>，互动通过策略发生。没有真正的“绑定”机制。</p>
                         </div>
-                        <p class="text-slate-600 mb-4">关注个体的 <span class="font-semibold text-slate-800">Action (动作/策略)</span>。</p>
-                        <div id="card-nash" class="hidden text-sm text-slate-500 bg-slate-50 p-4 rounded-lg mt-4 animate-fade-in">
-                            <ul class="list-disc pl-5 space-y-2">
-                                <li><strong>困境：</strong> 3人以上时，策略组合极其复杂，难以预测。</li>
-                                <li><strong>缺失：</strong> 无法模拟“具有约束力的协议” (Binding Agreements)。</li>
-                                <li><strong>核心问题：</strong> “我出什么招能最大化我的利益？”</li>
-                            </ul>
-                        </div>
-                        <p class="text-center text-xs text-teal-600 font-medium mt-2">点击展开详情</p>
+                        <p class="text-center font-bold text-slate-800 mt-2">结论：这是 Actions 的组合。</p>
                     </div>
                 </div>
 
-                <!-- Cooperative Card -->
-                <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition duration-300 border border-slate-100 group cursor-pointer border-l-4 border-l-teal-600" onclick="toggleCard('card-coop')">
-                    <div class="p-8">
-                        <div class="flex items-center justify-between mb-4">
-                            <h3 class="text-xl font-bold text-slate-800 group-hover:text-teal-700 transition">合作博弈</h3>
-                            <span class="text-2xl">🤝</span>
+                <!-- Cooperative Perspective -->
+                <div class="bg-white rounded-xl shadow-md p-8 border border-slate-100 hover:shadow-lg transition duration-300 border-l-4 border-l-teal-600">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-slate-800">合作博弈 (联盟视角)</h3>
+                        <span class="text-2xl">🤝</span>
+                    </div>
+                    <div class="space-y-4 text-slate-600">
+                        <p><strong>关键转折：</strong> 3 人以上时，“结盟”成为新的行动方式。</p>
+                        <p>当玩家可以“绑定在一起行动、协作、共享结果”时，出现新的对象：<br>
+                        <span class="math-serif block text-center my-2 bg-teal-50 p-2 rounded text-teal-900 font-bold">联盟 S ⊆ N</span></p>
+                        <div class="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500">
+                            <p class="font-bold text-teal-800">问题变了：</p>
+                            <p class="text-sm text-teal-900">不再是“谁用什么策略”，而是<strong>“谁跟谁组队、能创造多少总价值、再怎么分”</strong>。</p>
                         </div>
-                        <p class="text-slate-600 mb-4">关注 <span class="font-semibold text-slate-800">Coalition (联盟)</span> 和 <span class="font-semibold text-slate-800">Value (价值)</span>。</p>
-                        <div id="card-coop" class="hidden text-sm text-slate-500 bg-slate-50 p-4 rounded-lg mt-4 animate-fade-in">
-                            <ul class="list-disc pl-5 space-y-2">
-                                <li><strong>新视角：</strong> 忽略具体战术，直接定义联盟 <span class="math-display">S</span> 能保证的最大收益 <span class="math-display">v(S)</span>。</li>
-                                <li><strong>核心问题：</strong> “我跟谁一伙？我们能挣多少？怎么分？”</li>
-                                <li><strong>关键假设：</strong> 可转移效用 (TU)。蛋糕可以做大，内部分配自由。</li>
-                            </ul>
-                        </div>
-                        <p class="text-center text-xs text-teal-600 font-medium mt-2">点击展开详情</p>
+                        <p class="text-center font-bold text-teal-700 mt-2">结论：这是 Groups 的组合。</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Section 2: Building Blocks -->
-    <section id="blocks" class="py-16 bg-white">
-        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section 2: Transferable Utility (TU) Concept (MOVED UP) -->
+    <section id="tu-concept" class="py-16 bg-white border-t border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-12">
-                <h2 class="text-3xl font-bold text-slate-900">第二部分：核心概念构建</h2>
+                <h2 class="text-3xl font-bold text-slate-900">第二部分：可转移效用 (TU) — 合作的基石</h2>
                 <p class="mt-4 text-lg text-slate-600">
-                    在深入研究如何分配利益之前，我们需要建立数学模型来描述联盟的价值。这里引入了特征函数和分配向量的概念。
+                    在正式定义数学模型之前，我们需要解决一个核心问题：联盟内部的利益如何衡量？这里引入了合作博弈最重要的假设：<strong>钱能重新分配，价值只看总和</strong>。
+                </p>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <!-- Concept Text -->
+                <div class="space-y-6">
+                    <div class="prose">
+                        <h3 class="text-teal-800 text-xl font-bold mb-3">联盟带来“可实现的收益集合”</h3>
+                        <p>设玩家 <span class="math-serif">{1, 2, 3}</span>。如果 1 和 2 组成联盟 <span class="math-serif">{1, 2}</span>，他们通过协作（比如 1 出技术，2 出资金）能获得一组收益。</p>
+                        <p>假设初始产出分配是：<strong class="text-slate-800">(1, 10)</strong>。</p>
+                        
+                        <h3 class="text-teal-800 text-xl font-bold mt-6 mb-3">侧支付 (Side-Payment) 的魔力</h3>
+                        <p>在 TU (Transferable Utility) 设定下，效用就像货币一样可以自由转账。</p>
+                        <ul class="list-disc pl-5 text-slate-600 space-y-2">
+                            <li>原始分配：(1, 10)</li>
+                            <li><strong>动作：</strong> Player 2 觉得 Player 1 很重要，决定分他 4 块钱。</li>
+                            <li>新分配：(5, 6)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="bg-teal-50 p-4 rounded-lg border-l-4 border-teal-500 shadow-sm">
+                        <p class="font-bold text-teal-800">为什么 TU 导致了 v(S)？</p>
+                        <p class="text-teal-700">
+                            因为利益可以随意流动，联盟真正“拥有”的不再是一个固定的元组，而是一个<strong>总量</strong>。<br>
+                            <span class="math-serif block mt-2 text-center text-lg font-bold">1 + 10 = 11</span>
+                            无论最后怎么分（(5,6) 还是 (1,10)），总和都是 11。因此，我们可以把联盟 <span class="math-serif">S</span> 的能力抽象为一个<strong>单值函数</strong> <span class="math-serif">v(S)</span>。
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Interactive TU Visualizer -->
+                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-teal-100 text-teal-800 text-xs font-bold px-3 py-1 rounded-bl">TU 演示</div>
+                    
+                    <h3 class="text-center font-bold text-slate-800 mb-8">联盟 {1, 2} 的内部转账</h3>
+
+                    <div class="flex justify-between items-end mb-8 px-4 h-40">
+                        <!-- Player 1 Bar -->
+                        <div class="flex flex-col items-center w-1/3 transition-all duration-500">
+                            <span class="mb-2 font-bold text-slate-600">Player 1</span>
+                            <div id="bar-p1" class="w-full bg-teal-600 rounded-t-lg flex items-center justify-center text-white font-bold transition-all duration-500" style="height: 20px;">
+                                <span id="val-p1">1</span>
+                            </div>
+                        </div>
+
+                        <!-- Transfer Arrow -->
+                        <div class="w-1/3 flex flex-col items-center justify-center pb-4">
+                            <button onclick="transferMoney()" class="bg-teal-50 text-teal-700 hover:bg-teal-100 border border-teal-200 px-4 py-2 rounded-full text-sm font-bold shadow transition mb-2">
+                                💸 P2 给 P1 转 4 块
+                            </button>
+                            <button onclick="resetMoney()" class="text-xs text-slate-400 hover:text-slate-600 underline">
+                                重置
+                            </button>
+                        </div>
+
+                        <!-- Player 2 Bar -->
+                        <div class="flex flex-col items-center w-1/3 transition-all duration-500">
+                            <span class="mb-2 font-bold text-slate-600">Player 2</span>
+                            <div id="bar-p2" class="w-full bg-slate-400 rounded-t-lg flex items-center justify-center text-white font-bold transition-all duration-500" style="height: 200px;">
+                                <span id="val-p2">10</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-slate-200 pt-4 text-center">
+                        <p class="text-sm text-slate-500 mb-1">联盟总价值 (v({1,2}))</p>
+                        <p class="text-3xl font-extrabold text-teal-800">11</p>
+                        <p class="text-xs text-slate-400 mt-2">无论怎么转账，总价值恒定</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Building Blocks (Formal Definitions) -->
+    <section id="blocks" class="py-16 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="mb-12">
+                <h2 class="text-3xl font-bold text-slate-900">第三部分：核心概念构建</h2>
+                <p class="mt-4 text-lg text-slate-600">
+                    既然我们接受了 TU 假设，确定了联盟可以用单一数值表示，现在就可以正式建立数学积木了。
                 </p>
             </div>
 
             <div class="grid lg:grid-cols-2 gap-12 items-start">
                 <!-- Concepts List -->
                 <div class="space-y-6">
-                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                        <h4 class="font-bold text-lg text-teal-800 mb-2">特征函数 (Characteristic Function)</h4>
-                        <p class="text-slate-700"><span class="math-display">v: 2<sup>N</sup> → ℝ</span></p>
-                        <p class="text-sm text-slate-500 mt-2">描述任何一个联盟子集能获得的最大总收益。</p>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-lg text-teal-800 mb-2">1. 特征函数 (Characteristic Function)</h4>
+                        <p class="text-slate-700"><span class="math-serif">v: 2<sup>N</sup> → ℝ</span></p>
+                        <p class="text-sm text-slate-500 mt-2">基于 TU，描述任何一个联盟子集能获得的最大<strong>总收益</strong>。</p>
                     </div>
                     
-                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                        <h4 class="font-bold text-lg text-teal-800 mb-2">超可加性 (Superadditivity)</h4>
-                        <p class="text-slate-700"><span class="math-display">v(A ∪ B) ≥ v(A) + v(B)</span></p>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-lg text-teal-800 mb-2">2. 超可加性 (Superadditivity)</h4>
+                        <p class="text-slate-700"><span class="math-serif">v(A ∪ B) ≥ v(A) + v(B)</span></p>
                         <p class="text-sm text-slate-500 mt-2">直觉：1+1 > 2。如果合并没好处，大家就不会合作。</p>
                     </div>
 
-                    <div class="bg-slate-50 p-6 rounded-lg border border-slate-200">
-                        <h4 class="font-bold text-lg text-teal-800 mb-2">分配 (Imputation)</h4>
-                        <p class="text-slate-700">向量 <span class="math-display">x = (x<sub>1</sub>, ..., x<sub>n</sub>)</span></p>
+                    <div class="bg-white p-6 rounded-lg border border-slate-200 shadow-sm">
+                        <h4 class="font-bold text-lg text-teal-800 mb-2">3. 分配 (Imputation)</h4>
+                        <p class="text-slate-700">如何分这笔总钱？向量 <span class="math-serif">x = (x<sub>1</sub>, ..., x<sub>n</sub>)</span></p>
                         <ul class="text-sm text-slate-500 mt-2 list-disc pl-5">
-                            <li><strong>个体理性：</strong> <span class="math-display">x<sub>i</sub> ≥ v({i})</span> (不能比单干差)</li>
-                            <li><strong>集体效率：</strong> <span class="math-display">∑ x<sub>i</sub> = v(N)</span> (分完所有钱)</li>
+                            <li><strong>个体理性：</strong> <span class="math-serif">x<sub>i</sub> ≥ v({i})</span> (不能比单干差)</li>
+                            <li><strong>集体效率：</strong> <span class="math-serif">∑ x<sub>i</sub> = v(N)</span> (分完所有钱)</li>
                         </ul>
                     </div>
                 </div>
@@ -224,7 +276,7 @@
                 <!-- Interactive Chart: Imputation Visualizer -->
                 <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100">
                     <h3 class="font-bold text-slate-800 mb-4 text-center">分配可视化演示 (3人博弈)</h3>
-                    <p class="text-sm text-slate-500 mb-4 text-center">总价值 <span class="math-display">v(N) = 100</span>。调整滑块进行分配。</p>
+                    <p class="text-sm text-slate-500 mb-4 text-center">总价值 <span class="math-serif">v(N) = 100</span>。调整滑块进行分配。</p>
                     
                     <div class="chart-wrapper">
                         <canvas id="imputationChart"></canvas>
@@ -236,14 +288,14 @@
                                 <span>Player 1 (<span id="p1-val">33</span>)</span>
                                 <span class="text-slate-400">个体底线: 10</span>
                             </div>
-                            <input type="range" id="p1-slider" min="0" max="100" value="33" class="w-full" oninput="updateImputation()">
+                            <input type="range" id="p1-slider" min="0" max="100" value="33" class="w-full accent-teal-600" oninput="updateImputation()">
                         </div>
                         <div>
                             <div class="flex justify-between text-sm mb-1">
                                 <span>Player 2 (<span id="p2-val">33</span>)</span>
                                 <span class="text-slate-400">个体底线: 10</span>
                             </div>
-                            <input type="range" id="p2-slider" min="0" max="100" value="33" class="w-full" oninput="updateImputation()">
+                            <input type="range" id="p2-slider" min="0" max="100" value="33" class="w-full accent-teal-600" oninput="updateImputation()">
                         </div>
                         <!-- Player 3 is calculated -->
                         <div class="flex justify-between items-center p-3 bg-slate-100 rounded">
@@ -258,23 +310,23 @@
         </div>
     </section>
 
-    <!-- Section 3: The Core (Interactive Simulation) -->
-    <section id="core" class="py-16 bg-slate-50 border-t border-slate-200">
+    <!-- Section 4: The Core (Interactive Simulation) -->
+    <section id="core" class="py-16 bg-white border-t border-slate-200">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-10">
-                <h2 class="text-3xl font-bold text-slate-900">第三部分：核心 (The Core) — 稳定性的圣杯</h2>
+                <h2 class="text-3xl font-bold text-slate-900">第四部分：核心 (The Core) — 稳定性的圣杯</h2>
                 <p class="mt-4 text-lg text-slate-600 max-w-3xl mx-auto">
-                    什么样的分配方案是谁都无法推翻的？核心是所有不被任何联盟“支配”的分配方案集合。让我们通过经典的“手套博弈”来体验这一点。
+                    既有了总价值 <span class="math-serif">v(N)</span>，我们该怎么分这笔钱？核心是所有不被任何联盟“支配”（即造反）的分配方案集合。
                 </p>
             </div>
 
             <div class="grid md:grid-cols-12 gap-8">
                 <!-- Theory Column -->
                 <div class="md:col-span-5 space-y-6">
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-sm border border-slate-200">
                         <h3 class="font-bold text-lg text-slate-800 mb-2">支配 (Domination)</h3>
                         <p class="text-sm text-slate-600 mb-4">
-                            如果一个联盟 <span class="math-display">S</span> 发现他们单干的总收益 <span class="math-display">v(S)</span> 比当前分配给他们的总和 <span class="math-display">∑<sub>i∈S</sub> x<sub>i</sub></span> 还要高，他们就会脱离大集体。这时，我们说该分配被联盟 <span class="math-display">S</span> 支配（推翻）了。
+                            如果一个联盟 <span class="math-serif">S</span> 发现他们单干的总收益 <span class="math-serif">v(S)</span> 比当前分配给他们的总和 <span class="math-serif">∑<sub>i∈S</sub> x<sub>i</sub></span> 还要高，他们就会脱离大集体。
                         </p>
                         <div class="bg-amber-50 border-l-4 border-amber-500 p-4">
                             <p class="text-xs text-amber-800 font-semibold">造反宣言：</p>
@@ -282,14 +334,11 @@
                         </div>
                     </div>
                     
-                    <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-sm border border-slate-200">
                         <h3 class="font-bold text-lg text-slate-800 mb-2">Core 的定义</h3>
-                        <p class="text-sm text-slate-600">
-                            Core 是满足以下条件的分配集合：
-                        </p>
-                        <div class="mt-3 text-sm bg-slate-50 p-3 rounded font-mono text-slate-700">
-                            1. ∑ x<sub>i</sub> = v(N) <br>
-                            2. ∑<sub>i∈S</sub> x<sub>i</sub> ≥ v(S), ∀ S
+                        <div class="text-sm bg-white p-3 rounded font-mono text-slate-700 border border-slate-200">
+                            1. ∑ x<sub>i</sub> = v(N) <span class="text-slate-400 text-xs">// 分完所有钱</span><br>
+                            2. ∑<sub>i∈S</sub> x<sub>i</sub> ≥ v(S), ∀ S <span class="text-slate-400 text-xs">// 没人想造反</span>
                         </div>
                     </div>
                 </div>
@@ -311,7 +360,7 @@
                             <!-- Glove Game Controls -->
                             <div class="mb-8">
                                 <label class="block text-sm font-medium text-slate-700 mb-2">Player 1 (Left Glove) 份额: <span id="glove-p1-display" class="font-bold text-teal-700">50</span></label>
-                                <input type="range" id="glove-slider" min="0" max="100" value="50" class="w-full" oninput="updateGloveGame()">
+                                <input type="range" id="glove-slider" min="0" max="100" value="50" class="w-full accent-teal-600" oninput="updateGloveGame()">
                                 <div class="flex justify-between text-xs text-slate-400 mt-1">
                                     <span>0 (P1受虐)</span>
                                     <span>100 (P1独吞)</span>
@@ -345,10 +394,6 @@
                             <div id="core-result" class="mt-6 p-4 rounded-lg text-center font-bold text-white transition-all duration-300 bg-slate-400">
                                 调整滑块以查看结果
                             </div>
-                            
-                            <p class="text-xs text-slate-500 mt-4 text-center">
-                                *注：这里假设剩余金额由 P2 和 P3 平分（因为他们是对称的）。
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -356,11 +401,11 @@
         </div>
     </section>
 
-    <!-- Section 4: Advanced Theory (LP & Balanced Collections) -->
-    <section id="advanced" class="py-16 bg-white">
+    <!-- Section 5: Advanced Theory (LP & Balanced Collections) -->
+    <section id="advanced" class="py-16 bg-slate-50 border-t border-slate-200">
         <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="mb-12">
-                <h2 class="text-3xl font-bold text-slate-900">第四部分：深度理论 —— 从 LP 对偶到平衡合集</h2>
+                <h2 class="text-3xl font-bold text-slate-900">第五部分：深度理论 —— 从 LP 对偶到平衡合集</h2>
                 <p class="mt-4 text-lg text-slate-600">
                     为什么有时候 Core 是空的？我们能不能不解复杂的方程组直接判断？这一部分利用线性规划的对偶性，推导出了著名的 Bondareva-Shapley 定理。
                 </p>
@@ -380,17 +425,17 @@
                         <div class="flex flex-col md:flex-row gap-8 items-center">
                             <div class="flex-1">
                                 <h3 class="text-xl font-bold text-slate-800 mb-4">大联盟CEO的难题</h3>
-                                <p class="text-slate-600 mb-4">想象你是大联盟的CEO，你要给股东分红 (<span class="math-display">x<sub>i</sub></span>)。</p>
+                                <p class="text-slate-600 mb-4">想象你是大联盟的CEO，你要给股东分红 (<span class="math-serif">x<sub>i</sub></span>)。</p>
                                 <ul class="list-disc pl-5 space-y-2 text-slate-600">
-                                    <li><strong>目标：</strong> 成本最小化 (Minimize <span class="math-display">Z = ∑ x<sub>i</sub></span>)</li>
-                                    <li><strong>约束：</strong> 必须满足所有小团体 <span class="math-display">S</span> 的胃口 (<span class="math-display">∑<sub>i∈S</sub> x<sub>i</sub> ≥ v(S)</span>)</li>
+                                    <li><strong>目标：</strong> 成本最小化 (Minimize <span class="math-serif">Z = ∑ x<sub>i</sub></span>)</li>
+                                    <li><strong>约束：</strong> 必须满足所有小团体 <span class="math-serif">S</span> 的胃口 (<span class="math-serif">∑<sub>i∈S</sub> x<sub>i</sub> ≥ v(S)</span>)</li>
                                 </ul>
                                 <div class="mt-4 p-4 bg-red-50 text-red-800 rounded-lg border border-red-100">
-                                    <strong>核心判据：</strong> 如果算出来的最小成本 <span class="math-display">Z<sub>min</sub> > v(N)</span>（我们要发的钱超过了实际赚的钱），那 Core 就是空的。
+                                    <strong>核心判据：</strong> 如果算出来的最小成本 <span class="math-serif">Z<sub>min</sub> > v(N)</span>（我们要发的钱超过了实际赚的钱），那 Core 就是空的。
                                 </div>
                             </div>
                             <div class="flex-1 flex justify-center">
-                                <div class="text-6xl">📉</div> <!-- Minimalist Icon placeholder -->
+                                <div class="text-6xl">📉</div> 
                             </div>
                         </div>
                     </div>
@@ -400,7 +445,7 @@
                         <div class="grid md:grid-cols-2 gap-8">
                             <div>
                                 <h3 class="text-xl font-bold text-slate-800 mb-4">转向对偶问题 (Dual LP)</h3>
-                                <p class="text-slate-600 mb-4">引入对偶变量 <span class="math-display">y<sub>S</sub></span>（给每个联盟 <span class="math-display">S</span> 一个权重）。</p>
+                                <p class="text-slate-600 mb-4">引入对偶变量 <span class="math-serif">y<sub>S</sub></span>（给每个联盟 <span class="math-serif">S</span> 一个权重）。</p>
                                 <div class="bg-slate-50 p-4 rounded border border-slate-200 font-mono text-sm text-slate-700 mb-4">
                                     Maximize W = ∑ y<sub>S</sub> v(S)<br>
                                     Subject to: ∑<sub>S∋i</sub> y<sub>S</sub> = 1 (对每个玩家 i)
@@ -412,9 +457,9 @@
                                 <div class="chart-wrapper" style="height: 200px;">
                                     <canvas id="balancedCollectionChart"></canvas>
                                 </div>
-                                <p class="text-center text-xs text-slate-500 mt-2">玩家的时间分配示意图</p>
+                                <p class="text-center text-xs text-slate-500 mt-2">玩家 i 的时间投入 (∑y = 1)</p>
                                 <p class="text-slate-600 text-sm mt-4">
-                                    如果存在一组权重 <span class="math-display">y<sub>S</sub></span> 使得每个玩家都刚好工作 100% 的时间，这组联盟集合就叫<strong>平衡合集</strong>。
+                                    如果存在一组权重 <span class="math-serif">y<sub>S</sub></span> 使得每个玩家都刚好工作 100% 的时间，这组联盟集合就叫<strong>平衡合集</strong>。
                                 </p>
                             </div>
                         </div>
@@ -426,16 +471,13 @@
                             <h3 class="text-2xl font-bold text-teal-800 mb-6">Bondareva-Shapley 定理</h3>
                             <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
                                 <p class="text-xl font-serif text-slate-800 mb-4">
-                                    Core 非空 ⟺ <span class="math-display">∑<sub>S∈C</sub> y<sub>S</sub> v(S) ≤ v(N)</span>
+                                    Core 非空 ⟺ <span class="math-serif">∑<sub>S∈C</sub> y<sub>S</sub> v(S) ≤ v(N)</span>
                                 </p>
                                 <p class="text-slate-500 text-sm">对于任意平衡合集 C</p>
                             </div>
                             <p class="text-lg text-slate-700 mb-6">
                                 <strong>人话解释：</strong> 如果你把大家的时间拆碎了分给几个小团队，这些小团队加起来创造的价值，不能超过大家在一起干创造的价值。否则大家就会倾向于拆伙。
                             </p>
-                            <div class="inline-block bg-teal-100 text-teal-800 px-4 py-2 rounded-full text-sm font-semibold">
-                                强对偶性 (Strong Duality) 的完美体现
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -443,24 +485,17 @@
         </div>
     </section>
 
-    <!-- Section 5: Conclusion -->
+    <!-- Footer -->
     <section class="py-16 bg-slate-900 text-white">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl font-bold mb-8">总结与升华</h2>
-            <div class="grid md:grid-cols-2 gap-8 text-left">
-                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
-                    <h3 class="text-xl font-bold text-teal-400 mb-4">逻辑闭环</h3>
-                    <p class="text-slate-300">
-                        我们从个体的贪婪 (策略) 走到群体的博弈 (Core)，最后用线性规划 (Bondareva-Shapley) 找到了合作不破裂的数学底线。
-                    </p>
-                </div>
-                <div class="bg-slate-800 p-6 rounded-lg border border-slate-700">
-                    <h3 class="text-xl font-bold text-teal-400 mb-4">现实意义</h3>
-                    <ul class="text-slate-300 space-y-2 list-disc pl-5">
-                        <li><strong>政治：</strong> 解释议会联盟的不稳定性（Core 为空导致循环背叛）。</li>
-                        <li><strong>商业：</strong> 供应链利润分配的公平性证明。</li>
-                    </ul>
-                </div>
+            <h2 class="text-3xl font-bold mb-8">总结</h2>
+            <div class="bg-slate-800 p-6 rounded-lg border border-slate-700 text-left max-w-2xl mx-auto">
+                <ul class="text-slate-300 space-y-4 list-disc pl-5">
+                    <li><strong>视角转换：</strong> 从个体的动作 (<span class="math-serif">Action</span>) 转向群体的组合 (<span class="math-serif">Group</span>)。</li>
+                    <li><strong>核心机制：</strong> 可转移效用 (<span class="math-serif">TU</span>) 允许联盟关注总价值 <span class="math-serif">v(S)</span>，而非固定分配。</li>
+                    <li><strong>稳定性：</strong> <span class="math-serif">Core</span> 是所有不被任何子联盟“造反”的分配集合。</li>
+                    <li><strong>数学工具：</strong> 通过 <span class="math-serif">Bondareva-Shapley</span> 定理，我们用线性规划解决了存在性问题。</li>
+                </ul>
             </div>
             <p class="mt-12 text-slate-500 text-sm">
                 Based on "Essentials of n-Person Cooperative Game Theory"
@@ -470,25 +505,7 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // --- 1. Paradigm Shift Interactions ---
-        function toggleCard(id) {
-            const el = document.getElementById(id);
-            if (el.classList.contains('hidden')) {
-                el.classList.remove('hidden');
-            } else {
-                el.classList.add('hidden');
-            }
-        }
-
-        // --- 2. Imputation Visualizer (Chart.js) ---
-        // Data storage
-        const imputationData = {
-            total: 100,
-            p1: 33,
-            p2: 33,
-            p3: 34
-        };
-
+        // --- 1. Imputation Chart Logic (Section 2) ---
         const ctxImputation = document.getElementById('imputationChart').getContext('2d');
         const imputationChart = new Chart(ctxImputation, {
             type: 'bar',
@@ -505,14 +522,9 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100
-                    }
+                    y: { beginAtZero: true, max: 100 }
                 },
-                plugins: {
-                    legend: { display: false }
-                }
+                plugins: { legend: { display: false } }
             }
         });
 
@@ -521,9 +533,6 @@
             const p2Val = parseInt(document.getElementById('p2-slider').value);
             const alertBox = document.getElementById('imputation-alert');
 
-            // Logic: P3 gets remainder. If remainder < 0, constrain sliders.
-            // Simplified logic: Allow slider movement but show alert if invalid.
-            
             let p3Val = 100 - p1Val - p2Val;
             
             // Visual Updates
@@ -531,12 +540,12 @@
             document.getElementById('p2-val').innerText = p2Val;
             
             if (p3Val < 0) {
-                p3Val = 0; // Clamp visual
+                p3Val = 0; // Visual clamp
                 alertBox.classList.remove('hidden');
                 alertBox.classList.add('bg-red-100', 'text-red-800');
                 alertBox.innerText = "警告：总分配超过 100！这是无效的分配。";
             } else if (p1Val < 10 || p2Val < 10 || p3Val < 10) { 
-                // Assuming individual rationality v({i}) = 10 for this demo context
+                // Assuming individual rationality v({i}) = 10 for demo
                 alertBox.classList.remove('hidden');
                 alertBox.classList.add('bg-amber-100', 'text-amber-800');
                 alertBox.classList.remove('bg-red-100', 'text-red-800');
@@ -551,24 +560,54 @@
             imputationChart.update();
         }
 
-        // --- 3. Glove Game Simulation ---
+        // --- 2. TU Visualizer Logic (Section 3) ---
+        function transferMoney() {
+            const barP1 = document.getElementById('bar-p1');
+            const barP2 = document.getElementById('bar-p2');
+            const valP1 = document.getElementById('val-p1');
+            const valP2 = document.getElementById('val-p2');
+
+            barP1.style.height = '100px'; 
+            barP1.classList.remove('bg-teal-600');
+            barP1.classList.add('bg-teal-500');
+
+            barP2.style.height = '120px';
+            
+            setTimeout(() => {
+                valP1.innerText = '5';
+                valP2.innerText = '6';
+            }, 300);
+        }
+
+        function resetMoney() {
+            const barP1 = document.getElementById('bar-p1');
+            const barP2 = document.getElementById('bar-p2');
+            const valP1 = document.getElementById('val-p1');
+            const valP2 = document.getElementById('val-p2');
+
+            barP1.style.height = '20px';
+            barP1.classList.add('bg-teal-600');
+            barP2.style.height = '200px';
+            barP1.classList.remove('bg-teal-500'); // Ensure color resets
+            barP1.classList.add('bg-teal-600');
+
+            setTimeout(() => {
+                valP1.innerText = '1';
+                valP2.innerText = '10';
+            }, 300);
+        }
+
+        // --- 3. Glove Game Simulation (Section 4) ---
         function updateGloveGame() {
             const p1 = parseInt(document.getElementById('glove-slider').value);
-            // Symmetry assumption: P2 and P3 split the rest equally
             const remainder = 100 - p1;
             const p2 = remainder / 2;
             const p3 = remainder / 2;
 
-            // Update Displays
             document.getElementById('glove-p1-display').innerText = p1;
             document.getElementById('glove-p2-display').innerText = p2.toFixed(1);
             document.getElementById('glove-p3-display').innerText = p3.toFixed(1);
 
-            // Check Stability
-            // v(12) = 100. They have p1 + p2.
-            // v(13) = 100. They have p1 + p3.
-            // v(23) = 0. They have p2 + p3. (Always > 0, so stable against {2,3})
-            
             const sum12 = p1 + p2;
             const sum13 = p1 + p3;
             
@@ -592,7 +631,7 @@
                 status12.className = "text-xs font-bold px-2 py-1 rounded bg-green-200 text-green-800";
             }
 
-            // Check Coalition {1, 3} (Identical to 12 in this symmetric case)
+            // Check Coalition {1, 3}
             if (sum13 < 100) {
                 row13.classList.add('bg-red-50');
                 status13.innerText = "造反!";
@@ -603,7 +642,6 @@
                 status13.className = "text-xs font-bold px-2 py-1 rounded bg-green-200 text-green-800";
             }
 
-            // Final Core Determination
             if (p1 === 100) {
                 resultBox.className = "mt-6 p-4 rounded-lg text-center font-bold text-white transition-all duration-300 bg-green-600";
                 resultBox.innerText = "🎉 处于 Core 中！ (P1 垄断)";
@@ -613,32 +651,22 @@
             }
         }
 
-        // --- 4. Advanced Theory Tabs ---
+        // --- 4. Advanced Theory Tabs (Section 5) ---
         function switchTab(tabName) {
-            // Buttons
-            document.getElementById('tab-lp').classList.replace('text-teal-700', 'text-slate-500');
-            document.getElementById('tab-lp').classList.remove('border-b-2', 'border-teal-700', 'bg-white');
-            
-            document.getElementById('tab-dual').classList.replace('text-teal-700', 'text-slate-500');
-            document.getElementById('tab-dual').classList.remove('border-b-2', 'border-teal-700', 'bg-white');
+            ['lp', 'dual', 'theorem'].forEach(name => {
+                const btn = document.getElementById('tab-' + name);
+                btn.classList.replace('text-teal-700', 'text-slate-500');
+                btn.classList.remove('border-b-2', 'border-teal-700', 'bg-white');
+                document.getElementById('content-' + name).classList.add('hidden');
+            });
 
-            document.getElementById('tab-theorem').classList.replace('text-teal-700', 'text-slate-500');
-            document.getElementById('tab-theorem').classList.remove('border-b-2', 'border-teal-700', 'bg-white');
-
-            // Active Button
             const activeBtn = document.getElementById('tab-' + tabName);
             activeBtn.classList.replace('text-slate-500', 'text-teal-700');
             activeBtn.classList.add('border-b-2', 'border-teal-700', 'bg-white');
-
-            // Content
-            document.getElementById('content-lp').classList.add('hidden');
-            document.getElementById('content-dual').classList.add('hidden');
-            document.getElementById('content-theorem').classList.add('hidden');
-
             document.getElementById('content-' + tabName).classList.remove('hidden');
         }
 
-        // --- 5. Balanced Collection Chart ---
+        // --- 5. Balanced Collection Chart (Section 5) ---
         const ctxBalanced = document.getElementById('balancedCollectionChart').getContext('2d');
         new Chart(ctxBalanced, {
             type: 'doughnut',
@@ -671,4 +699,3 @@
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. Chart.js used via CDN in Canvas wrappers. -->
 </body>
 </html>
-
